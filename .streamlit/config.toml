@@ -1,0 +1,45 @@
+# Light and dark are both defined, so the appearance toggle in the app menu stays available.
+# Chart colours are the palette checked with the dataviz validator against these two backgrounds.
+
+[theme]
+showWidgetBorder = true
+baseRadius = "8px"
+buttonRadius = "8px"
+font = "'Inter':https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "'Source Serif 4':https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+baseFontSize = 15
+headingFontSizes = ["34px", "26px", "21px", "18px", "16px", "14px"]
+headingFontWeights = [600, 600, 600, 600, 600, 600]
+paddingTop = "3rem"
+
+[theme.light]
+primaryColor = "#1c5cab"
+backgroundColor = "#fcfcfb"
+secondaryBackgroundColor = "#f3f2ee"
+textColor = "#0b0b0b"
+linkColor = "#1c5cab"
+borderColor = "#e1e0d9"
+codeBackgroundColor = "#f3f2ee"
+grayColor = "#898781"
+chartCategoricalColors = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
+chartSequentialColors = ["#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7", "#3987e5", "#2a78d6", "#1c5cab", "#104281"]
+dataframeBorderColor = "#e1e0d9"
+dataframeHeaderBackgroundColor = "#f3f2ee"
+
+[theme.dark]
+primaryColor = "#5598e7"
+backgroundColor = "#1a1a19"
+secondaryBackgroundColor = "#262624"
+textColor = "#f0efec"
+linkColor = "#86b6ef"
+borderColor = "#383835"
+codeBackgroundColor = "#262624"
+grayColor = "#898781"
+chartCategoricalColors = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767"]
+chartSequentialColors = ["#104281", "#184f95", "#1c5cab", "#256abf", "#2a78d6", "#3987e5", "#5598e7", "#6da7ec", "#86b6ef", "#b7d3f6"]
+dataframeBorderColor = "#383835"
+dataframeHeaderBackgroundColor = "#262624"
+
+[browser]
+gatherUsageStats = false

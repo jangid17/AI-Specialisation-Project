@@ -1,0 +1,442 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{accent}{HTML}{1C5CAB}
+\definecolor{muted}{HTML}{6B6B66}
+\definecolor{codebg}{HTML}{F4F3EF}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\ttfamily\small,backgroundcolor=\color{codebg},frame=none,columns=fullflexible,
+        breaklines=true,xleftmargin=6pt,framexleftmargin=6pt,aboveskip=6pt,belowskip=6pt}
+\newcommand{\code}[1]{\texttt{#1}}
+\sloppy
+\newcommand{\screenshot}[3]{%
+  \begin{figure}[htbp]\centering
+  \fbox{\includegraphics[width=0.94\linewidth,height=0.62\textheight,keepaspectratio]{figures/#1}}
+  \caption{#2}\label{#3}\end{figure}}
+
+\input{measurements.tex}
+
+\title{\textbf{An AI Research Assistant for Reading Papers}\\[4pt]
+\large Rebuilding \code{AI-Research-Assistant-New} around real arXiv papers, a real language model,\\
+and output a professor can check}
+\author{Kunal Jangid\\
+\normalsize Roll no.\ B23MT1026\\[2pt]
+\normalsize CSD4020: AI Specialisation Project}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent The original repository presented itself as an AI research assistant but analysed a folder of
+hand-written JSON records, used placeholder language models and embeddings whenever no OpenAI key was set,
+and reported metrics that did not measure what their names said. This report describes the replacement: a
+Streamlit application that searches arXiv through its API, reads each paper's full text from arXiv's HTML
+rendering with BeautifulSoup, indexes it with a local embedding model, and uses an LLM on Groq's free tier to
+write digests, answer questions with cited passages and compare papers. It is designed around a professor's
+reading workflow: deciding what to read, understanding it quickly, checking what the model claims, and
+reusing the result in teaching and writing. On a library of \mPapers{} papers (\mWords{} words of extracted
+text), \mQuotesVerified{} of the \mQuotes{} supporting quotes in the generated digests (\mQuotesPct\%) were
+found word for word in the source paper.
+\end{abstract}
+
+\tableofcontents
+\bigskip
+
+%=====================================================================
+\section{Starting point}
+
+The repository contained four entry scripts (\code{fixed\_assistant.py}, \code{interactive\_assistant.py},
+\code{docker\_assistant.py}, \code{docker\_interactive.py}), a plotting module, a Docker set-up and a
+\code{research-db/} folder of paper records. Running it and reading the code showed five problems.
+
+\begin{description}[leftmargin=0pt]
+\item[The AI was a placeholder.] Without a key beginning \code{sk-}, the code fell back to LangChain's
+  \code{FakeListLLM}, which returns canned strings in rotation, and \code{FakeEmbeddings}, which returns
+  random vectors. The ``insights'' a user saw were therefore not derived from the papers.
+\item[The papers were not real.] Papers were loaded only from JSON files in \code{research-db/}, written by
+  hand with fields such as \code{keywords} and \code{citations}. There was no search and no way to add a
+  real paper.
+\item[The metrics did not measure their names.] ``Collaboration index'' was papers divided by authors,
+  capped at 1; ``trend velocity'' was the number of papers divided by ten; ``diversity'' was the ratio of
+  distinct keywords to keywords; ``impact'' averaged the hand-entered citation field.
+\item[Docker could not run.] The Dockerfile was built on a Terminal-Bench base image, and the compose file
+  ran a \code{solution.sh} that is not in the repository, with log paths taken from benchmark environment
+  variables.
+\item[A credential was committed.] \code{docker-compose.yaml} contained a literal \code{LANGCHAIN\_API\_KEY}
+  value. It should be treated as leaked and revoked by its owner; deleting the file does not remove it from
+  the Git history.
+\end{description}
+
+All of these files were removed. What replaced them is described below.
+
+%=====================================================================
+\section{What a professor needs from such a tool}
+
+New papers appear faster than anyone can read them. A professor typically has to:
+\begin{enumerate}
+\item \textbf{triage}: notice the few new papers that matter to their research, out of hundreds a week;
+\item \textbf{understand} a chosen paper quickly, sometimes from outside their own speciality;
+\item \textbf{check} anything a summary claims before repeating it to students or in a review;
+\item \textbf{reuse} what they read: in a lecture, a reading group, a referee report or a related-work section.
+\end{enumerate}
+A language model helps with all four, but only if its output can be traced to the paper. That principle
+shaped the design: every generated statement is either tied to quoted text that the application checks, or
+to numbered passages that are shown next to the answer. Figures on the Insights page are computed, never
+generated.
+
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Need & Feature & Where \\
+\midrule
+Triage & Search ranked by similarity to a written statement of research interests; a watchlist of followed
+  searches; a briefing that rates each new paper high/medium/low for this reader with a reason &
+  Discover \\
+Understand & Digest at two depths, written for a specialist, a neighbouring field or a graduate student;
+  background needed; questions answered from the paper & Reader \\
+Check & Each key result carries a quote that is matched against the paper text; answers cite numbered
+  passages shown beside them; full extracted text is browsable & Reader \\
+Reuse & Discussion questions for a reading group; side-by-side comparison; related-work paragraph with
+  numbered references; BibTeX and Markdown export; personal notes, tags and reading status &
+  Reader, Synthesize, Library \\
+Overview & Timeline, categories, characteristic terms, topic map, co-author network, citation counts &
+  Insights \\
+\bottomrule
+\end{tabularx}
+\caption{The reading workflow and the feature that serves each step.}
+\end{table}
+
+%=====================================================================
+\section{Architecture}
+
+\begin{figure}[htbp]\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  box/.style={draw=accent,rounded corners=3pt,fill=accent!6,align=center,font=\small,minimum height=0.95cm,
+              text width=3.1cm},
+  ext/.style={draw=muted,dashed,rounded corners=3pt,align=center,font=\small,minimum height=0.95cm,
+              text width=3.1cm},
+  arr/.style={-{Stealth[length=5pt]},thick,muted}, node distance=0.55cm and 0.9cm]
+\node[box] (ui) {Streamlit pages\\\scriptsize discover, library,\\reader, synthesize,\\insights};
+\node[box,below left=of ui] (arx) {\code{arxiv\_client}\\\scriptsize search, metadata};
+\node[box,below=of ui] (an) {\code{analysis}\\\scriptsize prompts, quote check};
+\node[box,below right=of ui] (ft) {\code{fulltext}\\\scriptsize BeautifulSoup};
+\node[box,below=of arx] (met) {\code{metrics}\\\code{citations}};
+\node[box,below=of an] (llm) {\code{llm}\\\scriptsize Groq client, waits};
+\node[box,below=of ft] (ret) {\code{retrieval}\\\scriptsize chunks, embeddings};
+\node[box,below=of ret] (st) {\code{store}\\\scriptsize JSON + NumPy in \code{data/}};
+\node[ext,left=1.0cm of arx] (xa) {arXiv API\\\scriptsize export.arxiv.org};
+\node[ext,left=1.0cm of met] (xs) {Semantic Scholar\\\scriptsize citation counts};
+\node[ext,right=1.0cm of ft] (xh) {arxiv.org/html\\\scriptsize ar5iv fallback};
+\node[ext,below=of llm] (xg) {Groq\\\scriptsize \code{gpt-oss-120b}};
+\draw[arr] (ui.west) -| (arx); \draw[arr] (ui) -- (an); \draw[arr] (ui.east) -| (ft);
+\draw[arr] (ui.west) -- ++(-4.5mm,0) |- (met.east); \draw[arr] (an) -- (llm); \draw[arr] (an) -- (ret); \draw[arr] (ft) -- (ret);
+\draw[arr] (ret) -- (st);
+\draw[arr,dashed] (arx) -- (xa); \draw[arr,dashed] (met) -- (xs);
+\draw[arr,dashed] (ft) -- (xh); \draw[arr,dashed] (llm) -- (xg);
+\end{tikzpicture}}
+\caption{Modules of the \code{research\_assistant} package and the services they call. Dashed boxes are
+external. Embeddings are computed locally; only the LLM call leaves the machine with paper text.}
+\label{fig:arch}
+\end{figure}
+
+The code is a small Python package used by five Streamlit pages (Figure~\ref{fig:arch}). Each module has one
+job, and nothing in the package imports Streamlit except \code{ui.py}, so every module is tested without a
+running app. A saved paper is one JSON file (metadata, extracted sections, digests, notes, status) and one
+compressed NumPy file (passage vectors). There is no database server: a reading library holds hundreds of
+papers, not millions, and an exact matrix product over them takes milliseconds.
+
+%=====================================================================
+\section{Getting real papers}
+
+\subsection{Search and metadata: the arXiv API}
+\code{arxiv\_client.py} builds queries for the Atom API at \code{export.arxiv.org/api/query}. Quoted phrases
+are kept as phrases, other words are joined with \code{AND}, a search can be limited to title, abstract,
+author or all fields, and to one of sixteen arXiv categories, and results can be sorted by relevance,
+submission date or last update. The feed is parsed with the standard library's XML parser into a
+\code{Paper} record: identifier and version, title, authors, abstract, dates, primary and secondary
+categories, comment, journal reference and DOI. arXiv reports query errors as a feed entry rather than an
+HTTP status; those are raised as errors instead of being shown as a paper. Calls are spaced at least three
+seconds apart, as arXiv's terms of use ask, and every request carries a descriptive User-Agent.
+
+\subsection{Full text: BeautifulSoup on arXiv's HTML}
+Abstracts are not enough to digest a paper. arXiv renders most recent submissions to HTML with LaTeXML at
+\code{arxiv.org/html/<id>}, and the ar5iv project covers many older ones. \code{fulltext.py} fetches the first
+of the two that exists and walks the document with BeautifulSoup, relying on LaTeXML's \code{ltx\_*} classes:
+\begin{itemize}
+\item sections (\code{ltx\_section}, appendices) become \code{Section(title, text)}; subsection headings are
+  kept inline as \code{\#\#} lines so retrieved passages still say where they came from;
+\item mathematics is replaced by its LaTeX source from the \code{alttext} attribute, written as
+  \code{\$\ldots\$}, so formulas survive as text the model can read;
+\item footnotes, author blocks and navigation are removed; data tables are removed (their cells are
+  unreadable once flattened) but their captions are kept in brackets, as are figure captions; equation
+  tables are kept;
+\item the bibliography is counted, not included.
+\end{itemize}
+A page with fewer than 1,500 characters of body text is rejected, so a stub or an error page is never taken
+for a paper. When neither source has the paper it is saved with its abstract only, marked as such in the
+interface, and offered a retry.
+
+%=====================================================================
+\section{Retrieval}
+
+Each paper is split into passages of at most 1,100 characters on paragraph and sentence boundaries, with
+150 characters of overlap; the abstract is always the first passage. Passages are embedded with
+\code{BAAI/bge-small-en-v1.5} through \code{fastembed}, an ONNX runtime that needs no GPU and no PyTorch. The
+model's instruction prefix is added on the query side only, as it was trained, and vectors are
+L2-normalised so a dot product is the cosine similarity. The \mPapers{} saved papers produce \mPassages{}
+passages.
+
+The same model ranks search results against the reader's interests: the professor writes a few sentences
+about their research once, and each abstract is scored by its cosine similarity to that statement. The
+score orders results; the interface says explicitly that it is not a percentage.
+
+%=====================================================================
+\section{Using a language model on a free tier}
+
+\subsection{Model and limits}
+The LLM is \code{openai/gpt-oss-120b} on Groq, called through its OpenAI-compatible endpoint with the
+\code{openai} SDK and low reasoning effort. The key is read from \code{GROQ\_API\_KEY} or
+\code{GROQ\_CLOUD\_API\_KEY} in \code{.env}, or from Streamlit secrets when deployed. Groq's free tier allows
+8,000 tokens per minute, counting prompt and completion together, which shapes everything else:
+\begin{itemize}
+\item a single request carries at most about 15,000 characters of paper text and asks for at most 1,800
+  output tokens;
+\item when the limit is hit, the client reads the wait Groq asks for (the \code{retry-after} header, or the
+  ``try again in \ldots'' message), waits, tells the user it is waiting, and tries again; a request that is
+  too large for the tier is reported as such rather than retried;
+\item streaming is used for answers, so text appears as it is written.
+\end{itemize}
+
+\subsection{Two depths of digest}
+A whole paper does not fit in one request, so the reader chooses:
+\begin{description}
+\item[Focused] (one call): the abstract, the introduction, up to two closing sections (conclusion,
+  discussion, limitations) and the passages retrieved for three questions --- the method, the main results
+  with numbers, and limitations --- until the character budget is used.
+\item[Full paper] (one call per block of about 12,000 characters, then one more): the model first takes
+  reading notes on each block, keeping every quantitative result and copying key sentences verbatim; the
+  digest is then written from all the notes. A 12,000-word paper needs five or six calls and, on the free
+  tier, a few minutes.
+\end{description}
+Each digest records which text it was written from, and the interface shows it.
+
+\subsection{Structured output that can be checked}
+Digests, comparisons and briefings are requested as JSON objects with named fields. Model output is not
+always well formed, so:
+\begin{itemize}
+\item the parser accepts code fences and surrounding prose and extracts the object;
+\item an answer wrapped in an extra object is unwrapped; an answer missing a required field is requested
+  once more and otherwise reported as an error --- an empty box is never shown as if the model had found
+  nothing (this fixed an intermittent empty ``Where they agree'' panel on the Synthesize page);
+\item digest fields are coerced to their types (a string where a list was asked for becomes a one-item list,
+  a null becomes empty), so exports cannot fail on an unexpected shape.
+\end{itemize}
+
+\subsection{Quote verification}
+Each key result in a digest has two parts: a one-sentence claim and a quote of at most 30 words that the
+model is told to copy exactly. The application then searches the paper's text for the quote after
+lower-casing, collapsing whitespace and punctuation, and dropping full stops other than decimal points. A
+quote with an ellipsis passes when every fragment of 15 or more characters is found. The result is shown on
+each card as ``Quote found in the paper'' or ``Not found word for word'' (Figure~\ref{fig:digest}).
+
+This check has a precise and limited meaning. A match shows that the quoted words are in the paper, not that
+the claim follows from them; the reader still has to compare the two, which is why they are displayed
+together. A miss usually means paraphrase rather than invention (Section~\ref{sec:results}).
+
+\subsection{Answers with sources}
+In the Ask view, a question is embedded, the six closest passages of the paper (or eight across the whole
+library) are numbered and sent with the instruction to cite them as [1], [2] and to say so when the passages
+do not contain the answer. The passages are shown beneath the answer with their section names, so every
+citation can be followed (Figure~\ref{fig:ask}). The last four turns of the conversation are included so
+follow-up questions work.
+
+%=====================================================================
+\section{The interface}
+
+The application uses Streamlit 1.67 with top navigation between five pages, a light and a dark theme
+defined in \code{.streamlit/config.toml} (Inter for the interface, Source Serif~4 for headings, JetBrains
+Mono for code), and Material icons. Streamlit's bundled \emph{developing-with-streamlit} skill was followed
+for layout and widget choice: segmented controls for exclusive views, pills for status filters, dialogs
+for destructive actions, compact status indicators for long operations, \code{st.write\_stream} for
+answers, and the selected paper bound to the URL so a reader view can be bookmarked or shared.
+
+\screenshot{discover.png}{Discover. Results from the arXiv API, ordered by cosine similarity to the
+professor's interests statement. Papers already saved are marked and open in the reader.}{fig:discover}
+
+\screenshot{library.png}{Library. Saved papers with reading status, tags, whether full text was extracted,
+and citation counts; several rows can be selected to change status, export BibTeX or remove.}{fig:library}
+
+\screenshot{reader_digest.png}{Reader, Digest view. Depth and audience are chosen above the digest. Each key
+result shows the model's claim, the quote it gave, and whether that quote was found in the paper.}{fig:digest}
+
+\screenshot{reader_ask.png}{Reader, Ask view. The answer cites numbered passages; the passages themselves
+are listed below it.}{fig:ask}
+
+\screenshot{synthesize.png}{Synthesize, comparing five saved papers: a side-by-side table, agreements,
+differences and open questions, and a related-work paragraph with its numbered references. Both the
+paragraph and the BibTeX can be downloaded.}{fig:synth}
+
+%=====================================================================
+\section{Visualisations and their accuracy}
+
+The Insights page (Figures~\ref{fig:ins1}--\ref{fig:dark}) answers ``what is in my library?''. Each chart was
+chosen for what it has to show, and each states in a caption what it measures and what it does not.
+
+\begin{description}[leftmargin=0pt]
+\item[Papers over time.] A bar chart of counts by month or, beyond three years, by year of first
+  submission. Empty periods are filled with zeros so gaps are visible rather than closed up.
+\item[Categories.] Horizontal bars of primary arXiv category, sorted. Each paper is counted once, so the
+  bars sum to the number of papers.
+\item[Characteristic terms.] Terms and two-word phrases ranked by mean TF-IDF weight over titles and
+  abstracts, with English and academic stop words (``paper'', ``propose'', ``state-of-the-art'', \ldots)
+  removed, terms in more than 85\% of papers dropped, and a term hidden when a higher-ranked phrase already
+  contains it. Bar length is \emph{document frequency} --- the number of papers containing the term --- which
+  can be read directly, rather than a TF-IDF weight, which cannot.
+\item[Topic map.] Abstract embeddings are clustered with $k$-means, $k$ from 2 to 4 chosen by silhouette
+  score, and drawn in two dimensions with PCA. Groups are labelled with their most characteristic terms and
+  distinguished by shape as well as colour. The caption gives the silhouette score and the share of variance
+  the projection keeps (46\% for the library shown) and says that the axes have no units. With fewer than
+  six papers the map is not drawn.
+\item[Co-author network.] An interactive force-directed graph: a line joins authors of the same saved paper,
+  thicker for more joint papers, larger dots for authors of more papers. Above it are counts that can be
+  checked by hand: \mAuthors{} authors, \mPairs{} co-author pairs, density \mDensity, \mGroups{} separate groups
+  (the largest has \mLargestGroup{} authors), and \mRecurring{} authors who appear in more than one paper.
+\item[Citations.] Counts from Semantic Scholar, refreshed on demand. Citation counts are heavily skewed ---
+  from 217 to 202,845 here --- so when the largest is more than 50 times the smallest the chart switches to
+  dots on a logarithmic axis with ticks at powers of ten and exact values as labels; otherwise it uses bars.
+  The caption notes that older papers have had longer to be cited and that this is not a quality ranking.
+\end{description}
+
+\noindent\textbf{Colour.} Categorical colours follow a fixed order and stay attached to their category; the
+palette was checked with a colour-vision-deficiency validator in both light and dark mode and passed
+(lightness band, chroma, adjacent-pair separation under simulated deuteranopia, protanopia and tritanopia,
+and contrast against the surface). The dark theme uses its own colours checked against the dark surface,
+not an inversion. Text in charts uses the theme's ink, never the series colour; a check of the dark theme
+found the citation labels drawn in Vega's default black, and they now take the theme's text colour.
+
+\screenshot{insights_top.png}{Insights, upper half: counts by year and category, characteristic terms by
+document frequency, and the topic map with its silhouette score and retained variance stated.}{fig:ins1}
+
+\screenshot{insights_bottom.png}{Insights, lower half: the co-author network with its summary counts, and
+citation counts on a logarithmic axis.}{fig:ins2}
+
+\screenshot{insights_dark_top.png}{The same charts in the dark theme, with colours chosen and checked for
+the dark surface.}{fig:dark}
+
+%=====================================================================
+\section{Measurements}\label{sec:results}
+
+\code{report/measure.py} produced the numbers in this section from the library used for the screenshots:
+\mPapers{} papers on retrieval-augmented generation and its foundations, from 2017 to 2026, each saved
+through the application. It writes \code{measurements.json} and the \code{measurements.tex} file that this
+report reads, so the figures here are the script's output, not copied by hand.
+
+\begin{table}[htbp]\centering\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llrrrrrrrr@{}}
+\toprule
+arXiv & Title & Year & Sections & Words & Passages & Refs & Citations & Quotes found & Digest (s) \\
+\midrule
+\mPaperRows
+\midrule
+\multicolumn{3}{@{}l}{Total} & \mSections & \mWords & \mPassages & & & \mQuotesVerified/\mQuotes & \\
+\bottomrule
+\end{tabular}}
+\caption{Per-paper results. \emph{Words} and \emph{Sections} are of the text extracted from arXiv HTML;
+\emph{Refs} counts bibliography entries; \emph{Citations} are from Semantic Scholar (-- = not indexed yet);
+\emph{Quotes found} is how many supporting quotes in the focused, specialist digest were found in the paper;
+\emph{Digest} is wall-clock time including any rate-limit wait (-- = generated before timing was added).}
+\label{tab:papers}
+\end{table}
+
+\paragraph{Extraction.} Full text was extracted for all \mPapers{} papers: \mSections{} sections and
+\mWords{} words, from 2,331 words for a short paper to 12,443 for Self-RAG with its appendices. The 2026
+paper was published days before the measurement, so it had no citation record yet.
+
+\paragraph{Quote verification.} \mQuotesVerified{} of \mQuotes{} quotes (\mQuotesPct\%) were found in the
+paper. Each of the four misses was traced to its source. In every case the sentence exists in the paper and
+the claim matches it, but the model altered a word while copying: ``by showing that'' became ``show that''
+(arXiv:2404.10981), an abbreviation ``(CoT)'' was dropped inside an ellipsis quote (same paper), and in
+2005.11401 and 2004.04906 the words joining the quote to its sentence were rewritten. The check is strict on
+purpose: it cannot tell a harmless slip from a fabricated quote, so it flags both and leaves the judgement
+to the reader, who sees the quote next to the claim.
+
+\paragraph{Time.} \mTimed{} digests were timed, taking \mTimeMin{} to \mTimeMax{} seconds (median
+\mTimeMedian, mean \mTimeMean). These times are dominated by the free tier rather than the model: the
+generation run hit the token limit \mWaits{} times and waited \mWaitSeconds{} seconds in total. The first
+digest, made with a fresh token budget, took \mTimeMin{} seconds, which is what a focused digest costs when
+the per-minute budget is not exhausted --- for example when a reader opens papers one at a time.
+
+%=====================================================================
+\section{Testing}
+
+\code{python -m pytest -q} runs 40 tests in about three seconds without network access or an API key.
+\begin{itemize}
+\item \textbf{Unit tests} cover arXiv identifier parsing and query building, Atom feed parsing including
+  error entries, HTML extraction (mathematics, captions, dropped tables, nested tables, minimum length),
+  chunking, quote matching (case, punctuation, decimals, ellipses), digest normalisation, the retry for
+  incomplete model answers, JSON parsing from fenced or wrapped output, each metric (gap filling, category
+  counts, terms, the topic map's minimum size, network statistics), and the BibTeX and Markdown exports.
+\item \textbf{Page tests} use Streamlit's \code{AppTest} to render every page with an empty and a populated
+  library and to exercise filters, the reader's views, status changes and notes; the Insights test asserts
+  that five Vega-Lite charts and one ECharts graph are drawn.
+\end{itemize}
+Beyond the tests, the running application was driven end to end through Streamlit's agent interface and
+with a headless browser: searching arXiv, saving papers, generating digests at both depths, asking
+questions, comparing papers, briefing on a watchlist and refreshing citations, in both themes. The
+screenshots in this report come from those runs.
+
+%=====================================================================
+\section{Limitations}
+
+\begin{itemize}
+\item \textbf{Full text requires an HTML rendering.} Papers that arXiv cannot render and ar5iv does not
+  cover are kept with their abstract only. PDFs are not parsed.
+\item \textbf{Tables and figures are not read,} only their captions. A result reported only in a table can
+  be missed by a digest, and a quote taken from a table is flagged as not found.
+\item \textbf{A found quote is not a verified claim.} The check confirms the words are in the paper; the
+  reader has to judge whether the claim follows.
+\item \textbf{The comparison and the related-work paragraph are drafts.} They are written from digests and
+  abstracts, not full texts, and the page says so.
+\item \textbf{Authors are matched by name,} so namesakes merge and spelling variants split in the network.
+\item \textbf{External services.} Semantic Scholar's anonymous API is rate-limited and lags new papers; the
+  free Groq tier makes full-paper digests take minutes.
+\item \textbf{Single user.} The library is a folder of files on one machine. Deploying for a group would
+  need per-user storage.
+\end{itemize}
+
+%=====================================================================
+\section{Running it}
+
+\begin{lstlisting}
+uv venv --python 3.12 && uv pip install -r requirements.txt
+cp env.example .env          # set GROQ_API_KEY (or GROQ_CLOUD_API_KEY)
+source .venv/bin/activate
+streamlit run streamlit_app.py
+python -m pytest -q          # 40 tests, no network needed
+python report/measure.py     # regenerate the numbers in this report
+\end{lstlisting}
+Dependencies are pinned in \code{requirements.txt}. The embedding model (about 65~MB) is downloaded once into
+\code{data/models} the first time a paper is saved.
+
+\end{document}
