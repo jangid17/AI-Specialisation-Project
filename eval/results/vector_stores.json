@@ -1,0 +1,109 @@
+{
+ "chunking": "sentence-512",
+ "embedding_model": "BAAI/bge-small-en-v1.5",
+ "k": 10,
+ "real": [
+  {
+   "store": "NumPy exact (before)",
+   "vectors": 1661,
+   "build_s": 0.002,
+   "disk_mb": 2.55,
+   "query_ms_p50": 3.016178001416847,
+   "query_ms_p95": 6.019290200492833,
+   "filtered_ms_p50": 2.959457997349091,
+   "recall@10": 1.0
+  },
+  {
+   "store": "FAISS IndexFlatIP (exact)",
+   "vectors": 1661,
+   "build_s": 0.002,
+   "disk_mb": 2.55,
+   "query_ms_p50": 0.06752700210199691,
+   "query_ms_p95": 0.07143260154407471,
+   "filtered_ms_p50": 0.04925199755234644,
+   "recall@10": 1.0
+  },
+  {
+   "store": "FAISS HNSW (approximate)",
+   "vectors": 1661,
+   "build_s": 0.223,
+   "disk_mb": 3.0,
+   "query_ms_p50": 0.04910900315735489,
+   "query_ms_p95": 0.05674299827660434,
+   "filtered_ms_p50": 0.07508300041081384,
+   "recall@10": 1.0
+  },
+  {
+   "store": "ChromaDB (embedded, HNSW)",
+   "vectors": 1661,
+   "build_s": 0.468,
+   "disk_mb": 6.79,
+   "query_ms_p50": 0.5972769977233838,
+   "query_ms_p95": 0.9328231994004456,
+   "filtered_ms_p50": 1.0718589983298443,
+   "recall@10": 0.9987012987012988
+  },
+  {
+   "store": "Qdrant (local mode, no HNSW)",
+   "vectors": 1661,
+   "build_s": 3.646,
+   "disk_mb": 6.88,
+   "query_ms_p50": 1.7662019999988843,
+   "query_ms_p95": 6.789576799928912,
+   "filtered_ms_p50": 16.236620998824947,
+   "recall@10": 1.0
+  }
+ ],
+ "synthetic": [
+  {
+   "store": "NumPy exact (before)",
+   "vectors": 100000,
+   "build_s": 0.093,
+   "disk_mb": 153.6,
+   "query_ms_p50": 6.99849800002994,
+   "query_ms_p95": 8.599577200220665,
+   "filtered_ms_p50": 4.149278000113554,
+   "recall@10": 1.0
+  },
+  {
+   "store": "FAISS IndexFlatIP (exact)",
+   "vectors": 100000,
+   "build_s": 0.136,
+   "disk_mb": 153.6,
+   "query_ms_p50": 8.652497999719344,
+   "query_ms_p95": 18.13476040115347,
+   "filtered_ms_p50": 0.8779130002949387,
+   "recall@10": 1.0
+  },
+  {
+   "store": "FAISS HNSW (approximate)",
+   "vectors": 100000,
+   "build_s": 4.017,
+   "disk_mb": 180.82,
+   "query_ms_p50": 0.14463999832514673,
+   "query_ms_p95": 0.23650779912713915,
+   "filtered_ms_p50": 0.3229059984732885,
+   "recall@10": 0.9168831168831169
+  },
+  {
+   "store": "ChromaDB (embedded, HNSW)",
+   "vectors": 100000,
+   "build_s": 12.841,
+   "disk_mb": 201.87,
+   "query_ms_p50": 1.6541949989914428,
+   "query_ms_p95": 2.093940199847566,
+   "filtered_ms_p50": 35.981700999400346,
+   "recall@10": 0.9545454545454546
+  },
+  {
+   "store": "Qdrant (local mode, no HNSW)",
+   "vectors": 100000,
+   "build_s": 250.319,
+   "disk_mb": 414.01,
+   "query_ms_p50": 110.49914500108571,
+   "query_ms_p95": 118.31463180133142,
+   "filtered_ms_p50": 605.6322709991946,
+   "recall@10": 1.0
+  }
+ ]
+}

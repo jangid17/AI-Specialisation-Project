@@ -1,0 +1,718 @@
+{
+ "model": "openai/gpt-oss-120b",
+ "seed": 7,
+ "questions": [
+  {
+   "kind": "digest",
+   "arxiv_id": "1706.03762",
+   "question": "Does the Transformer achieve a higher BLEU score on English\u2011German translation than any previously reported model?",
+   "reference": "The Transformer outperforms previous best models on English\u2011German translation.",
+   "evidence": "Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU.",
+   "id": "q001"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "1706.03762",
+   "question": "Has the Transformer established the best single\u2011model performance for English\u2011French translation on the WMT 2014 benchmark?",
+   "reference": "It also sets a new single\u2011model state\u2011of\u2011the\u2011art on English\u2011French translation.",
+   "evidence": "On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs.",
+   "id": "q002"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "1706.03762",
+   "question": "Is the training speed of the Transformer considerably faster than that of recurrent or convolutional architectures?",
+   "reference": "Training is significantly faster than recurrent or convolutional baselines.",
+   "evidence": "The Transformer can be trained significantly faster than architectures based on recurrent or convolutional layers.",
+   "id": "q003"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "1706.03762",
+   "question": "How many identical layers does the encoder contain?",
+   "reference": "It consists of six identical layers.",
+   "evidence": "The encoder is composed of a stack of $N=6$ identical layers.",
+   "id": "q004"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "1706.03762",
+   "question": "How many parallel attention heads are used in the model?",
+   "reference": "The model uses eight parallel attention heads.",
+   "evidence": "In this work we employ $h=8$ parallel attention layers, or heads.",
+   "id": "q005"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "1706.03762",
+   "question": "What are the model dimension and the inner\u2011feed\u2011forward dimension?",
+   "reference": "The model dimension is 512 and the inner feed\u2011forward dimension is 2048.",
+   "evidence": "The dimensionality of input and output is $d_{\\text{model}}=512$, and the inner-layer has dimensionality $d_{ff}=2048$.",
+   "id": "q006"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2004.04906",
+   "question": "How many question\u2013passage pairs are needed for a dense retriever to surpass BM25 performance?",
+   "reference": "Training with only 1,000 question\u2013passage pairs already beats BM25.",
+   "evidence": "a dense passage retriever trained using only 1,000 examples already outperforms BM25",
+   "id": "q007"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2004.04906",
+   "question": "What is the approximate query throughput that DPR can achieve during inference?",
+   "reference": "DPR enables fast inference, processing nearly 1,000 questions per second.",
+   "evidence": "DPR can be made incredibly efficient, processing 995.0 questions per second, returning top 100 passages per question",
+   "id": "q008"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2004.04906",
+   "question": "What impact does using DPR have on the overall QA system's results on standard open-domain benchmarks?",
+   "reference": "End\u2011to\u2011end QA with DPR achieves new state\u2011of\u2011the\u2011art performance on several benchmarks.",
+   "evidence": "helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks",
+   "id": "q009"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2004.04906",
+   "question": "Can a dense embedding model be trained effectively using only question\u2011passage pairs and no extra pretraining?",
+   "reference": "Yes, the authors propose training solely on question\u2011passage pairs to improve dense retrieval.",
+   "evidence": "In this paper, we address the question: can we train a better dense embedding model using only pairs of questions and passages (or answers), without additional pretraining?",
+   "id": "q010"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2004.04906",
+   "question": "How does DPR\u2019s Top\u20115 accuracy compare to BM25 and its QA accuracy to ORQA on Natural Questions?",
+   "reference": "DPR achieves 65.2% Top\u20115 accuracy versus 42.9% for BM25 and 41.5% QA accuracy versus 33.3% for ORQA.",
+   "evidence": "Our Dense Passage Retriever (DPR) is exceptionally strong. It not only outperforms BM25 by a large margin (65.2% vs. 42.9% in Top-5 accuracy), but also results in a substantial improvement on the end-to-end QA accuracy compared to ORQA (41.5% vs. 33.3%) in the open Natural Questions setting.",
+   "id": "q011"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2004.04906",
+   "question": "What type of questions does the studied open\u2011domain QA system aim to answer?",
+   "reference": "It targets factoid questions that can be answered from a large, diverse corpus.",
+   "evidence": "Given a factoid question, such as \u201cWho first voiced Meg on Family Guy?\u201d or \u201cWhere was the 8th Dalai Lama born?\u201d, a system is required to answer it using a large corpus of diversified topics.",
+   "id": "q012"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2004.04906",
+   "question": "How does DPR\u2019s performance on NQ and TriviaQA compare to methods that use extra pretraining?",
+   "reference": "DPR outperforms those methods on both datasets despite not using additional pretraining.",
+   "evidence": "While both methods include additional pretraining tasks and employ an expensive end-to-end training regime, DPR manages to outperform them on both NQ and TriviaQA, simply by focusing on learning a strong passage retrieval model using pairs of questions and answers.",
+   "id": "q013"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2005.11401",
+   "question": "How does the language produced by the model compare in specificity, diversity, and factuality to that of a leading parametric-only seq2seq system?",
+   "reference": "RAG generates more specific, diverse, and factual language than a parametric\u2011only baseline.",
+   "evidence": "RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline.",
+   "id": "q014"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2005.11401",
+   "question": "What effect does increasing the number of retrieved documents have on open\u2011domain QA results for the two RAG variants, and at what point does performance stop improving for the token\u2011based version?",
+   "reference": "Retrieving more documents improves QA performance for RAG\u2011Sequence and peaks at 10 documents for RAG\u2011Token.",
+   "evidence": "retrieving more documents at test time monotonically improves Open-domain QA results for RAG-Sequence, but performance peaks for RAG-Token at 10 retrieved documents.",
+   "id": "q015"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2005.11401",
+   "question": "To what extent do the top retrieved documents match the gold evidence in the FEVER dataset, both for the single highest\u2011ranked document and for the top ten?",
+   "reference": "RAG\u2019s retrieved documents overlap heavily with gold evidence in FEVER.",
+   "evidence": "the top retrieved document is from a gold article in 71% of cases, and a gold article is present in the top 10 retrieved articles in 90% of cases.",
+   "id": "q016"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2005.11401",
+   "question": "What performance does the RAG model obtain on standard open-domain QA benchmarks?",
+   "reference": "It reaches state\u2011of\u2011the\u2011art scores on Natural Questions, WebQuestions, CuratedTrec and beats recent TriviaQA baselines.",
+   "evidence": "Our RAG models achieve state-of-the-art results on open Natural Questions [ 29 ] , WebQuestions [ 3 ] and CuratedTrec [ 2 ] and strongly outperform recent approaches that use specialised pre-training objectives on TriviaQA [ 24 ] .",
+   "id": "q017"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2005.11401",
+   "question": "How do the authors demonstrate that BART\u2019s parameters contain specific book titles?",
+   "reference": "They give BART a truncated prompt and show it correctly finishes the title, proving the title is encoded in its weights.",
+   "evidence": "We find evidence for this hypothesis by feeding the BART-only baseline with the partial decoding \"The Sun . BART completes the generation \"The Sun Also Rises\" is a novel by this author of \"The Sun Also Rises\" indicating the title \"The Sun Also Rises\" is stored in BART\u2019s parameters.",
+   "id": "q018"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2005.11401",
+   "question": "What role does the document index play in the proposed architecture?",
+   "reference": "It functions as an external memory that the model can attend to, similar to traditional memory networks.",
+   "evidence": "Our document index can be seen as a large external memory for neural networks to attend to, analogous to memory networks [ 64 , 55 ] .",
+   "id": "q019"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2005.11401",
+   "question": "How many documents are retrieved during inference for RAG\u2011Token on open\u2011domain QA?",
+   "reference": "Fifteen documents are retrieved for each query.",
+   "evidence": "For Open-domain QA we report test numbers using 15 retrieved documents for RAG-Token models.",
+   "id": "q020"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2007.01282",
+   "question": "How does the retrieval\u2011augmented generative model compare to earlier approaches when using a much smaller parameter count?",
+   "reference": "The retrieval\u2011augmented generative model outperforms prior methods despite using far fewer parameters.",
+   "evidence": "book T5 model obtains 36.6% accuracy with 11B parameters, while our approach obtains 44.1% with 770M parameters plus Wikipedia with BM25 retrieval.",
+   "id": "q021"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2007.01282",
+   "question": "What effect does expanding the retrieved passage set from ten to one hundred have on performance?",
+   "reference": "Increasing the number of retrieved passages from 10 to 100 yields sizable gains.",
+   "evidence": "increasing the number of passages from 10 to 100 leads to 6% improvement on TriviaQA and 3.5% improvement on NaturalQuestions.",
+   "id": "q022"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2007.01282",
+   "question": "How does training with a limited passage set and then fine\u2011tuning on a larger set affect compute usage and accuracy?",
+   "reference": "Training with fewer passages and fine\u2011tuning on 100 passages reduces compute while closing the accuracy gap.",
+   "evidence": "we can reach 46.0 EM on NaturalQuestions, using 147 GPU hours, compared to 425 GPU hours when training on 100 passages.",
+   "id": "q023"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2007.01282",
+   "question": "How does the performance of the method change as more passages are retrieved?",
+   "reference": "Performance continues to improve up to retrieving one hundred passages.",
+   "evidence": "This approach scales well with the number of retrieved passages, as the performance keeps improving when retrieving up to one hundred passages.",
+   "id": "q024"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2007.01282",
+   "question": "Which datasets have previously been used to study generative question answering?",
+   "reference": "NarrativeQA, CoQA, and ELI5.",
+   "evidence": "Generative question answering was mostly considered in previous work for datasets requiring to generate answers, such as NarrativeQA ( Ko\u010disk\u1ef3 et al., 2018 ) , CoQA ( Reddy et al., 2019 ) or ELI5 ( Fan et al., 2019 ) .",
+   "id": "q025"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2007.01282",
+   "question": "What exact\u2011match score and computational cost are achieved when fine\u2011tuning with 100 passages for 1000 steps?",
+   "reference": "46.0 EM on NaturalQuestions with 147 GPU hours, versus 425 GPU hours for full\u2011passage training.",
+   "evidence": "we can reach 46.0 EM on NaturalQuestions, using 147 GPU hours, compared to 425 GPU hours when training on 100 passages.",
+   "id": "q026"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2007.01282",
+   "question": "What conclusions are drawn about the simplicity and scalability of the approach?",
+   "reference": "Despite its simplicity, the approach is competitive and scales well with more retrieved passages.",
+   "evidence": "We show that while conceptually simple, this approach is competitive with existing methods, and that it scales well with the number of retrieved passages.",
+   "id": "q027"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2212.10496",
+   "question": "How does HyDE's performance compare to the unsupervised Contriever baseline across all measured metrics?",
+   "reference": "HyDE significantly improves over the unsupervised Contriever baseline across all evaluated metrics.",
+   "evidence": "HyDE bring sizable improvements to Contriever across the board for both precision-oriented and recall metrics.",
+   "id": "q028"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2212.10496",
+   "question": "In what way does HyDE's effectiveness exceed that of BM25 on the majority of datasets?",
+   "reference": "HyDE outperforms BM25 by large margins on most datasets.",
+   "evidence": "while unsupervised Contriever can underperform the classical BM25 approach, HyDE outperforms BM25 by large margins.",
+   "id": "q029"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2212.10496",
+   "question": "Can HyDE stay competitive with models that have been fine\u2011tuned despite lacking any relevance labels?",
+   "reference": "HyDE remains competitive with fine\u2011tuned models despite having no relevance labels.",
+   "evidence": "HyDE remains competitive even when compared to fine\u2011tuned models.",
+   "id": "q030"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2212.10496",
+   "question": "What happens to the small contrastive encoder's performance in multilingual retrieval as the number of languages increases?",
+   "reference": "On multilingual retrieval, HyDE shows strong performance but the small contrastive encoder saturates as language count grows.",
+   "evidence": "The small-sized contrastive encoder gets saturated as the number of languages scales.",
+   "id": "q031"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2212.10496",
+   "question": "What does a small amount of data enable for GPT\u20113 models?",
+   "reference": "It allows GPT\u20113 models to be aligned with human intent for instruction following.",
+   "evidence": "Ouyang et al. (2022) show that with a small amount of data, GPT-3 Brown et al. (2020) models can be aligned to human intent to follow instructions.",
+   "id": "q032"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2212.10496",
+   "question": "On which dataset are DPR, ANCE, and Contriever FT fine\u2011tuned?",
+   "reference": "They are fine\u2011tuned on the MS MARCO training data.",
+   "evidence": "DPR, ANCE and Contriever ${}^{\\text{FT}}$ are in-domain supervised models that are finetuned on MS MARCO training data.",
+   "id": "q033"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2212.10496",
+   "question": "How does HyDE\u2019s performance compare to BM25?",
+   "reference": "HyDE performs significantly better than BM25.",
+   "evidence": "HyDE outperforms BM25 by large margins.",
+   "id": "q034"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2309.15217",
+   "question": "Does the new metric align more closely with human judgments than the baseline GPT\u2011Score approaches?",
+   "reference": "Ragas metrics are more closely aligned with human judgments than baseline GPT\u2011Score methods.",
+   "evidence": "The results in Table 1 show that our proposed metrics are much closer aligned with the human judgements than the predictions from the two baselines.",
+   "id": "q035"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2309.15217",
+   "question": "Is the Ragas system highly accurate when assessing faithfulness?",
+   "reference": "Ragas achieves high accuracy for faithfulness evaluation.",
+   "evidence": "For faithfulness, the Ragas prediction are in general highly accurate.",
+   "id": "q036"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2309.15217",
+   "question": "Why is the agreement for answer relevance lower, according to the evidence?",
+   "reference": "Answer relevance agreement is lower due to subtle differences between candidate answers.",
+   "evidence": "For answer relevance, the agreement is lower, but this is largely due to the fact that the differences between the two candidate answers are often very subtle.",
+   "id": "q037"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2309.15217",
+   "question": "Which quality dimension is reported as the most challenging for automated evaluation?",
+   "reference": "Context relevance is the hardest dimension for automated evaluation.",
+   "evidence": "We found context relevance to be the hardest quality dimension to evaluate.",
+   "id": "q038"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2309.15217",
+   "question": "What makes implementing retrieval-augmented strategies challenging?",
+   "reference": "Implementation is challenging because performance depends on many tunable components such as the retrieval model, corpus, language model, and prompt design.",
+   "evidence": "While the usefulness of retrieval-augmented strategies is clear, their implementation requires a significant amount of tuning, as the overall performance will be affected by the retrieval model, the considered corpus, the LM, or the prompt formulation, among others.",
+   "id": "q039"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2309.15217",
+   "question": "How well do current models detect hallucinations with standard prompts?",
+   "reference": "Current models perform poorly at detecting hallucinations when standard prompting strategies are used.",
+   "evidence": "Recent analyses, however, suggest that existing models struggle with detecting hallucination when using standard prompting strategies Li et al. (2023) ; Azaria and Mitchell (2023) .",
+   "id": "q040"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2309.15217",
+   "question": "How were ties resolved when the LLM gave equal scores to answer candidates?",
+   "reference": "Ties were broken by random selection.",
+   "evidence": "Ties, where the same score is assigned by the LLM to both answer candidates, were broken randomly.",
+   "id": "q041"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2310.11511",
+   "question": "Does the method surpass ChatGPT on multiple open\u2011domain question\u2011answering and reasoning benchmarks?",
+   "reference": "Self-RAG outperforms ChatGPT on several open\u2011domain QA and reasoning tasks.",
+   "evidence": "Self-Rag outperforms ChatGPT and retrieval-augmented Llama2-chat on Open-domain QA, reasoning and fact verification tasks",
+   "id": "q042"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2310.11511",
+   "question": "Is its citation accuracy higher than every other system and even exceeds that of ChatGPT?",
+   "reference": "Self-RAG achieves higher citation precision than all models except ChatGPT, and even surpasses ChatGPT on citation precision.",
+   "evidence": "Our Self-Rag bridges this performance gap, even outperforming ChatGPT in citation precision, which measures whether the model-generated claim is fully supported by cited evidence.",
+   "id": "q043"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2310.11511",
+   "question": "Does always picking the single highest\u2011ranked passage degrade results, indicating the value of selective retrieval?",
+   "reference": "Using top\u20111 retrieved passage indiscriminately harms performance, showing the benefit of adaptive selection.",
+   "evidence": "Using the top passages regardless of their relevance (Retrieve top 1) ... causes a large drop in PopQA and ASQA",
+   "id": "q044"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2312.10997",
+   "question": "How does using external documents in a retrieval\u2011augmented approach affect the factual correctness of language model outputs?",
+   "reference": "RAG significantly reduces hallucination by grounding LLM outputs in external documents.",
+   "evidence": "By referencing external knowledge, RAG effectively reduces the problem of generating factually incorrect content.",
+   "id": "q045"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2312.10997",
+   "question": "Why don\u2019t large\u2011context models eliminate the need for retrieval\u2011augmented generation, considering speed and traceability?",
+   "reference": "Long\u2011context LLMs do not make RAG obsolete because retrieval improves efficiency and traceability.",
+   "evidence": "Providing LLMs with a large amount of context at once will significantly impact its inference speed, while chunked retrieval... can significantly improve operational efficiency.",
+   "id": "q046"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2312.10997",
+   "question": "In what way can adding unrelated documents to the retrieval set unexpectedly influence model performance?",
+   "reference": "Including irrelevant documents can sometimes improve accuracy, revealing robustness issues.",
+   "evidence": "The research findings reveal that including irrelevant documents can unexpectedly increase accuracy by over 30%.",
+   "id": "q047"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2312.10997",
+   "question": "What basic steps define the Naive RAG approach?",
+   "reference": "It consists of indexing, retrieval, and generation, known as the Retrieve\u2011Read framework.",
+   "evidence": "The Naive RAG follows a traditional process that includes indexing, retrieval, and generation, which is also characterized as a \u201cRetrieve-Read\u201d framework [ 7 ] .",
+   "id": "q048"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2312.10997",
+   "question": "How does iterative retrieval improve the RAG process?",
+   "reference": "By repeatedly switching between retrieval and generation to obtain more focused context.",
+   "evidence": "Iterative retrieval involves alternating between retrieval and generation, allowing for richer and more targeted context from the knowledge base at each step.",
+   "id": "q049"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2312.10997",
+   "question": "Which AI techniques are combined with RAG to broaden its functionality?",
+   "reference": "Fine\u2011tuning and reinforcement learning are integrated with RAG.",
+   "evidence": "RAG\u2019s technical integration with other AI methodologies, such as fine-tuning and reinforcement learning, has further expanded its capabilities.",
+   "id": "q050"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2312.10997",
+   "question": "What indicates the expanding RAG ecosystem?",
+   "reference": "An increase in RAG\u2011focused AI applications and ongoing tool development.",
+   "evidence": "The growing ecosystem of RAG is evidenced by the rise in RAG-centric AI applications and the continuous development of supportive tools.",
+   "id": "q051"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2401.15884",
+   "question": "How does the proposed method affect the performance of standard RAG and Self\u2011RAG on various datasets?",
+   "reference": "CRAG significantly improves the performance of both standard RAG and Self\u2011RAG across multiple datasets.",
+   "evidence": "From these results, we can conclude the following findings: First, the proposed method can significantly improve the performance of RAG and Self\u2011RAG.",
+   "id": "q052"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2401.15884",
+   "question": "What do the ablation results reveal when any of the three actions is removed?",
+   "reference": "Ablation studies show that removing any of the three actions degrades accuracy, confirming each action's contribution.",
+   "evidence": "there was a performance drop no matter which action was removed, illustrating that each action contributed to improving the robustness of generation.",
+   "id": "q053"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2401.15884",
+   "question": "What component does the paper introduce to evaluate retrieved documents?",
+   "reference": "It introduces a lightweight retrieval evaluator that judges the overall quality of the retrieved documents for each query.",
+   "evidence": "A lightweight retrieval evaluator is designed to assess the overall quality of retrieved documents for a query.",
+   "id": "q054"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2401.15884",
+   "question": "How does the system decide which retrieval action to take?",
+   "reference": "It quantifies a confidence degree that determines whether to label the retrieval as Correct, Incorrect, or Ambiguous.",
+   "evidence": "A confidence degree is quantified based on which different knowledge retrieval actions of { Correct , Incorrect , Ambiguous } can be triggered.",
+   "id": "q055"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2401.15884",
+   "question": "Which model is used as the base for the retrieval evaluator?",
+   "reference": "The retrieval evaluator is initialized with the T5-large model and then fine\u2011tuned.",
+   "evidence": "T5-large ( Raffel et al., 2020 ) is adopted for initializing the retrieval evaluator and fine-tuned.",
+   "id": "q056"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2401.15884",
+   "question": "What impact does the self\u2011correction mechanism have on performance compared to only adding web\u2011search knowledge?",
+   "reference": "Adding the self\u2011correction mechanism yields a significant performance boost over merely supplementing with web\u2011search information.",
+   "evidence": "augmenting RAG or Self-RAG with the proposed self-correction mechanism significantly outperformed the models consistently supplemented with web search knowledge in all cases.",
+   "id": "q057"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2404.10981",
+   "question": "Which aspect affects RAG performance more significantly than the size of the generator model?",
+   "reference": "Retrieval quality has a larger impact on RAG performance than the size of the generator model.",
+   "evidence": "retrieval quality has a more substantial impact on RAG performance than the choice of generator",
+   "id": "q058"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2404.10981",
+   "question": "What indexing structure is most frequently employed in classic information retrieval systems?",
+   "reference": "The inverted index is the most commonly used structure.",
+   "evidence": "One of the most commonly used indexing structures in traditional information retrieval systems is the inverted index.",
+   "id": "q059"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2404.10981",
+   "question": "How do contemporary RAG systems differ from basic RAGs in terms of retrieval hops?",
+   "reference": "Modern RAGs perform multi\u2011hop searches, repeatedly retrieving information, unlike basic single\u2011hop RAGs.",
+   "evidence": "While basic RAGs are usually single\u2011hop searches, i.e., they are retrieved only once as generated supplementary material, today\u2019s RAGs are mostly multi\u2011hop searches, i.e., they are searched several times through different search strategies until they are satisfied.",
+   "id": "q060"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2404.10981",
+   "question": "What is the main mechanism RECOMP uses to incorporate retrieved information?",
+   "reference": "It selectively prepends generated summaries of retrieved documents to the model input.",
+   "evidence": "RECOMP focuses on selective augmentation, where summaries generated from retrieved documents are selectively prepended to the input for the language model.",
+   "id": "q061"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2405.07437",
+   "question": "What limitation do existing benchmarks have regarding the scope of RAG evaluation?",
+   "reference": "Current benchmarks address only limited aspects of RAG evaluation and lack a holistic view.",
+   "evidence": "Most prior benchmarks predominantly tackle one or several aspects of the RAG assessment but lack a comprehensive, holistic analysis.",
+   "id": "q062"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2405.07437",
+   "question": "How does Auepora structure the analysis of RAG evaluations across targets, datasets, and measures?",
+   "reference": "Auepora provides a structured approach that jointly considers retrieval and generation targets, datasets, and measures.",
+   "evidence": "Through the proposed A Unified Evaluation Process of RAG, we outline a structured approach to analyzing RAG evaluations, focusing on targets, datasets and measures.",
+   "id": "q063"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2405.07437",
+   "question": "Why are standard retrieval metrics like Recall and Precision insufficient for evaluating RAG systems?",
+   "reference": "Because they fail to capture the nuanced behavior of RAG retrieval, prompting the need for more task\u2011specific metrics.",
+   "evidence": "The traditional evaluation indicators for retrieval, such as Recall and Precision, cannot fully capture the nuances of RAG retrieval systems, necessitating the development of more nuanced and task-specific evaluation metrics.",
+   "id": "q064"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2405.07437",
+   "question": "What constraint must RAG benchmarks consider when designing evaluation methods?",
+   "reference": "They must reconcile comprehensive evaluation with limited computational resources.",
+   "evidence": "RAG benchmarks must balance the need for thorough evaluation with the practical constraints of limited computational resources.",
+   "id": "q065"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2603.06183",
+   "question": "Which system shows the strongest match to radiologist choices on the RadPref test?",
+   "reference": "CRIMSON achieves the highest agreement with radiologist preferences on the RadPref benchmark.",
+   "evidence": "CRIMSON achieves the strongest alignment with radiologist preferences",
+   "id": "q066"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2603.06183",
+   "question": "How does the fine\u2011tuned MedGemmaCRIMSON perform compared to GPT\u20115.2 on preference matching and severity grading?",
+   "reference": "The fine\u2011tuned MedGemmaCRIMSON approximates GPT\u20115.2 performance on preference alignment and severity categorization.",
+   "evidence": "compare the fine\u2011tuned MedGemma (MedGemmaCRIMSON) against GPT\u20115.2 on RadPref preference alignment and severity categorization",
+   "id": "q067"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2603.06183",
+   "question": "Which existing LLM\u2011based metrics have been validated against radiologist judgments?",
+   "reference": "GREEN and LLM\u2011RadJudge have been validated against radiologist judgments.",
+   "evidence": "GREEN [ 15 ] and LLM\u2011RadJudge [ 21 ] both leverage LLMs to identify and classify errors in candidate reports, producing interpretable evaluations validated against radiologist judgments.",
+   "id": "q068"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2603.06183",
+   "question": "How many cases and categories does the RadJudge test suite contain, and how is the reference preference determined?",
+   "reference": "It contains 30 cases across 10 categories, with three radiologists reviewing each case and consensus establishing the reference preference.",
+   "evidence": "RadJudge comprises 30 curated cases across 10 clinically nuanced categories in which multiple candidate reports are compared and independently reviewed by three cardiothoracic radiologists, with agreement required to establish the reference preference.",
+   "id": "q069"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2603.06183",
+   "question": "What modifications are needed to extend CRIMSON to imaging modalities beyond chest X\u2011ray?",
+   "reference": "Prompts, finding ontologies, and severity criteria must be adapted to each modality\u2019s clinical standards.",
+   "evidence": "Applying CRIMSON to other imaging domains will require adaptation of prompts, finding ontologies, and severity criteria to align with modality\u2011specific clinical standards.",
+   "id": "q070"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2611.17161",
+   "question": "How frequently does parametric provenance occur in citable claims, and does its prevalence change with model size?",
+   "reference": "Parametric provenance occurs in 1.2%\u201315.7% of citable claims, increasing with model size.",
+   "evidence": "we find that provenance failure affects 1.2% to 15.7% of citable claims depending on the model",
+   "id": "q071"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2611.17161",
+   "question": "How effective is support\u2011based verification at detecting provenance failures compared to random guessing?",
+   "reference": "Support\u2011based verification performs at chance level for detecting provenance failures.",
+   "evidence": "support\u2011based verification ... gives results indistinguishable from chance across models",
+   "id": "q072"
+  },
+  {
+   "kind": "digest",
+   "arxiv_id": "2611.17161",
+   "question": "Which method yields a stronger provenance signal: measuring at the disputed token before context is added or using passage\u2011level attribution?",
+   "reference": "Passage\u2011level attribution separates provenance only weakly; token\u2011level contrast before context arrival is more informative.",
+   "evidence": "the provenance signal is carried by the model\u2019s distribution before context is supplied, and measuring at the disputed token rather than over the sentence improves detection",
+   "id": "q073"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2611.17161",
+   "question": "What does prior work say about the limits of parametric memory for different types of entities?",
+   "reference": "It works well for common entities but breaks down on rare ones.",
+   "evidence": "Mallen et al. (2023) showed that parametric memory suffices for popular entities but fails for rare ones;",
+   "id": "q074"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2611.17161",
+   "question": "On which benchmark are the detection claims based?",
+   "reference": "They rely on the ASQA dataset.",
+   "evidence": "Our detection claims rest on ASQA.",
+   "id": "q075"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2611.17161",
+   "question": "How are baseline methods evaluated in the study?",
+   "reference": "By reimplementing their metric calculations instead of running the original systems.",
+   "evidence": "Our comparison table uses reimplementations of the quantity each method computes rather than the published systems.",
+   "id": "q076"
+  },
+  {
+   "kind": "passage",
+   "arxiv_id": "2611.17161",
+   "question": "Do any models achieve the precision threshold needed for profitable flagging?",
+   "reference": "No, none meet the required precision at any budget.",
+   "evidence": "No model reaches it at any budget.",
+   "id": "q077"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "What is the recommended dosage of ibuprofen for adults?",
+   "reference": "",
+   "evidence": "",
+   "id": "q078"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "Which team won the 2018 FIFA World Cup?",
+   "reference": "",
+   "evidence": "",
+   "id": "q079"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "How do I bake sourdough bread at home?",
+   "reference": "",
+   "evidence": "",
+   "id": "q080"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "What is the boiling point of ethanol at sea level?",
+   "reference": "",
+   "evidence": "",
+   "id": "q081"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "Who painted the ceiling of the Sistine Chapel?",
+   "reference": "",
+   "evidence": "",
+   "id": "q082"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "What were the main causes of the French Revolution?",
+   "reference": "",
+   "evidence": "",
+   "id": "q083"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "How does photosynthesis convert light into chemical energy?",
+   "reference": "",
+   "evidence": "",
+   "id": "q084"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "What is the capital city of Australia?",
+   "reference": "",
+   "evidence": "",
+   "id": "q085"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "Which telescope first imaged a black hole's shadow?",
+   "reference": "",
+   "evidence": "",
+   "id": "q086"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "How many moons does Jupiter have?",
+   "reference": "",
+   "evidence": "",
+   "id": "q087"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "What GPU price did the authors pay per hour on their cloud provider?",
+   "reference": "",
+   "evidence": "",
+   "id": "q088"
+  },
+  {
+   "kind": "unanswerable",
+   "arxiv_id": null,
+   "question": "Which hospital approved the clinical trial described in the study?",
+   "reference": "",
+   "evidence": "",
+   "id": "q089"
+  }
+ ]
+}

@@ -104,6 +104,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv-eval
 env/
 venv/
 ENV/
@@ -166,3 +167,6 @@ report/*.aux
 report/*.log
 report/*.out
 report/*.toc
+
+# Evaluation caches (embeddings per chunking strategy and model)
+eval/.cache/

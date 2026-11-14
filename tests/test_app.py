@@ -28,7 +28,7 @@ def library(empty_library, monkeypatch):
     # The pages only need vectors of the right shape; a real model download has no place in a unit test.
     import numpy as np
 
-    def fake_embed(texts, query=False):
+    def fake_embed(texts, query=False, model=None):
         rng = np.random.default_rng(len(texts))
         vectors = rng.normal(size=(len(texts), 16)).astype("float32")
         return vectors / np.linalg.norm(vectors, axis=1, keepdims=True)

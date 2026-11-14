@@ -20,6 +20,11 @@ def index_path(arxiv_id: str) -> Path:
     return config.INDEX_DIR / f"{_safe(arxiv_id)}.npz"
 
 
+def arxiv_id_from_index(path: Path) -> str:
+    # New-style identifiers never contain "_"; old-style ones ("hep-th/9901001") had their one "/" replaced.
+    return path.stem.replace("_", "/")
+
+
 def save(paper: Paper) -> None:
     config.LIBRARY_DIR.mkdir(parents=True, exist_ok=True)
     if not paper.added_at:

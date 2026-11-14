@@ -1,0 +1,85 @@
+{
+ "answer_model": "openai/gpt-oss-120b",
+ "judge_model": "qwen/qwen3.8-27b",
+ "questions": 16,
+ "pipelines": {
+  "before": {
+   "chunking": "sentence-1100",
+   "embedding_model": "BAAI/bge-small-en-v1.5",
+   "method": "dense",
+   "passages": 6
+  },
+  "after": {
+   "chunking": "sentence-512",
+   "embedding_model": "BAAI/bge-small-en-v1.5",
+   "method": "hybrid+rerank",
+   "passages": 12
+  }
+ },
+ "results": {
+  "before": {
+   "faithfulness": {
+    "mean": 0.9605654761904762,
+    "ci95": [
+     0.9114583333333333,
+     1.0
+    ],
+    "scored": 16
+   },
+   "answer_relevancy": {
+    "mean": 0.8845499040035992,
+    "ci95": [
+     0.8467989047843937,
+     0.9185492515280098
+    ],
+    "scored": 16
+   },
+   "context_recall": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "scored": 16
+   },
+   "refused": 0,
+   "output_checks_flagged": {
+    "Citations valid": 0,
+    "Sentences cited": 8,
+    "Numbers in passages": 0
+   }
+  },
+  "after": {
+   "faithfulness": {
+    "mean": 0.9579861111111111,
+    "ci95": [
+     0.914236111111111,
+     1.0
+    ],
+    "scored": 16
+   },
+   "answer_relevancy": {
+    "mean": 0.8929712853680267,
+    "ci95": [
+     0.8596730218548788,
+     0.9245550472944771
+    ],
+    "scored": 15
+   },
+   "context_recall": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "scored": 15
+   },
+   "refused": 0,
+   "output_checks_flagged": {
+    "Citations valid": 0,
+    "Sentences cited": 10,
+    "Numbers in passages": 0
+   }
+  }
+ }
+}

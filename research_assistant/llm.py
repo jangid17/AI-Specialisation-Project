@@ -50,12 +50,13 @@ def _retry_after(err: openai.APIStatusError) -> float:
 
 
 def _create(messages: list[dict], max_tokens: int, json_mode: bool, stream: bool,
-            on_wait: Callable[[float], None] | None):
-    kwargs: dict = {"model": config.CHAT_MODEL, "messages": messages, "max_tokens": max_tokens,
+            on_wait: Callable[[float], None] | None, model: str | None = None):
+    model = model or config.CHAT_MODEL
+    kwargs: dict = {"model": model, "messages": messages, "max_tokens": max_tokens,
                     "temperature": 0.2, "stream": stream}
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
-    if config.CHAT_MODEL.startswith("openai/gpt-oss"):
+    if model.startswith("openai/gpt-oss"):
         kwargs["reasoning_effort"] = "low"  # reasoning tokens count against the per-minute budget
     for attempt in range(MAX_RETRIES + 1):
         try:
@@ -78,9 +79,12 @@ def _create(messages: list[dict], max_tokens: int, json_mode: bool, stream: bool
 
 
 def chat(messages: list[dict], max_tokens: int = config.MAX_OUTPUT_TOKENS, json_mode: bool = False,
-         on_wait: Callable[[float], None] | None = None) -> str:
-    """One completion. `on_wait(seconds)` is called before each rate-limit pause."""
-    resp = _create(messages, max_tokens, json_mode, False, on_wait)
+         on_wait: Callable[[float], None] | None = None, model: str | None = None) -> str:
+    """One completion, from the chat model unless `model` names another (e.g. a guard model).
+
+    `on_wait(seconds)` is called before each rate-limit pause.
+    """
+    resp = _create(messages, max_tokens, json_mode, False, on_wait, model)
     content = resp.choices[0].message.content or ""
     if not content.strip():
         raise LLMError("The model returned an empty answer (it may have run out of output tokens).")

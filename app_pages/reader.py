@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from research_assistant import analysis, export, fulltext, llm, retrieval, store, ui
+from research_assistant import analysis, config, export, fulltext, guardrails, llm, retrieval, store, ui
 from research_assistant.models import STATUSES
 
 st.caption("A digest you can check against the text, answers with the passages they came from, and your notes.")
@@ -58,6 +58,20 @@ def show_passages(passages: list[dict]) -> None:
         for i, p in enumerate(passages, start=1):
             st.markdown(f"**[{i}] {p['title']} — {p['section']}**")
             st.caption(p["text"].replace("## ", ""))
+
+
+def check_lines(checks: list[dict]) -> None:
+    for c in checks:
+        mark = (":green[:material/check_circle:]" if c["passed"]
+                else ":red[:material/block:]" if c["blocking"] else ":orange[:material/warning:]")
+        st.markdown(f"{mark} **{c['name']}**: {c['detail']}")
+
+
+def show_checks(checks: list[dict]) -> None:
+    flagged = sum(not c["passed"] for c in checks)
+    label = f"Guardrails: {flagged} of {len(checks)} checks flagged" if flagged else f"Guardrails: all {len(checks)} checks passed"
+    with st.expander(label, type="compact", icon=":material/gpp_maybe:" if flagged else ":material/verified_user:"):
+        check_lines(checks)
 
 
 if view == "Digest":
@@ -152,6 +166,8 @@ elif view == "Ask":
     for message in history:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+            if message.get("checks"):
+                show_checks(message["checks"])
             if message.get("passages"):
                 show_passages(message["passages"])
 
@@ -171,19 +187,43 @@ elif view == "Ask":
         with st.chat_message("user"):
             st.markdown(question)
         with st.chat_message("assistant"):
-            with st.status(":shimmer[Finding the relevant passages]", type="compact") as finding:
+            with st.status(":shimmer[Checking the question and finding passages]", type="compact") as finding:
                 previous = next((m["content"] for m in reversed(history) if m["role"] == "user"), "")
-                found = retrieval.search(f"{previous} {question}".strip(),
-                                         list(by_id) if whole else [paper_id], top_k=8 if whole else 6)
-                finding.update(label=f"Read {len(found)} passages", state="complete")
-            passages = [{"title": by_id[p.arxiv_id].title, "section": p.section, "text": p.text} for p in found]
+                got = analysis.retrieve_for_answer(question, list(by_id) if whole else [paper_id], previous,
+                                                   top_k=config.LIBRARY_PASSAGES if whole else config.ANSWER_PASSAGES)
+                steps = [c.to_dict() for c in got.checks]
+                with st.status("Checked the question", type="step"):
+                    check_lines([c for c in steps if c["name"] in guardrails.INPUT_CHECKS])
+                if len(steps) > sum(c["name"] in guardrails.INPUT_CHECKS for c in steps):
+                    with st.status(f"Searched: hybrid BM25 + embeddings, re-ranked ({len(got.passages)} passages)",
+                                   type="step"):
+                        check_lines([c for c in steps if c["name"] not in guardrails.INPUT_CHECKS])
+                finding.update(label=f"Not answered: {got.refusal}" if got.refusal else
+                               f"Checked the question and read {len(got.passages)} passages",
+                               state="error" if got.refusal else "complete")
+            passages = [] if got.refusal else [{"title": by_id[p.arxiv_id].title, "section": p.section, "text": p.text}
+                                               for p in got.passages]
+            checks, answer = got.checks, got.refusal
             try:
-                answer = st.write_stream(analysis.answer_stream(
-                    question, found, {i: p.title for i, p in by_id.items()},
-                    [{"role": m["role"], "content": m["content"]} for m in history], on_wait=ui.notify_wait))
-                show_passages(passages)
-                history.append({"role": "user", "content": question})
-                history.append({"role": "assistant", "content": answer, "passages": passages})
+                if answer:
+                    st.markdown(answer)
+                else:
+                    slot = st.empty()
+                    with slot.container():
+                        answer = st.write_stream(analysis.answer_stream(
+                            got.question, got.passages, {i: p.title for i, p in by_id.items()},
+                            [{"role": m["role"], "content": m["content"]} for m in history], on_wait=ui.notify_wait))
+                    output = guardrails.check_answer(answer, [p["text"] for p in passages])
+                    checks = checks + output
+                    if any(c.blocking for c in output):
+                        answer = "The answer was withheld by a safety check."
+                        slot.warning(answer, icon=":material/block:")
+                checks = [c.to_dict() for c in checks]
+                show_checks(checks[len(got.checks):] if not got.refusal else checks)
+                if passages:
+                    show_passages(passages)
+                history.append({"role": "user", "content": got.question})
+                history.append({"role": "assistant", "content": answer, "passages": passages, "checks": checks})
             except llm.LLMError as e:
                 st.error(str(e), icon=":material/error:")
     if history and st.button("Clear conversation", icon=":material/delete_sweep:", type="tertiary"):

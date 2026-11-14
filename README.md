@@ -11,6 +11,12 @@ researcher decide what to read, understand it faster, and write about it.
   (`openai/gpt-oss-120b` by default).
 - **Checkable output.** Every key result in a digest carries a quote, and the app checks whether that
   quote appears in the paper. Answers cite the passages they were written from and show them.
+- **Hybrid retrieval.** Questions are answered from passages found by BM25 and dense embeddings (FAISS),
+  fused with Reciprocal Rank Fusion and re-ranked by a cross-encoder, all on the CPU.
+- **Guardrails.** Prompt-attack and safety screening of questions, a relevance gate that refuses rather than
+  guesses, passage screening for planted instructions, and checks on every answer's citations and numbers.
+- **Measured.** An ablation study of chunking, embedding models, re-rankers and vector stores, a guardrail
+  evaluation and a Ragas evaluation are in [`eval/`](eval/README.md).
 - **Computed charts.** Nothing on the Insights page is estimated by the model.
 
 A written account of the design, with measurements, is in [`report/report.pdf`](report/report.pdf).
@@ -55,7 +61,9 @@ app_pages/                  discover, library, reader, synthesize, insights
 research_assistant/
   arxiv_client.py           arXiv Atom API: query building, parsing, 3-second spacing between calls
   fulltext.py               BeautifulSoup extraction from arxiv.org/html, with ar5iv as fallback
-  retrieval.py              chunking, local embeddings (fastembed), cosine search over NumPy arrays
+  chunking.py               six chunking strategies (sentence, fixed, paragraph, semantic, ...)
+  retrieval.py              BM25 + dense (fastembed, FAISS) search, rank fusion, cross-encoder re-ranking
+  guardrails.py             input, context and output checks
   llm.py                    Groq through its OpenAI-compatible endpoint; rate-limit waits; JSON parsing
   analysis.py               prompts: digest, answer, compare, briefing; quote verification
   metrics.py                timeline, categories, terms (TF-IDF), topic map (k-means + PCA), co-author graph
@@ -64,6 +72,7 @@ research_assistant/
   store.py, models.py       one JSON file per paper under data/library
   ui.py                     helpers shared by the pages
 tests/                      unit tests and page tests (no network or model needed)
+eval/                       ablation study, vector-store benchmark, guardrail and Ragas evaluations
 report/                     LaTeX report, figures, and the script that produces its numbers
 ```
 
@@ -75,8 +84,8 @@ Your library, index and profile live in `data/`, which is not committed.
 python -m pytest -q
 ```
 
-40 tests: arXiv feed parsing, full-text extraction, chunking, quote checking, retries for incomplete model
-answers, each metric, exports, and
+64 tests: arXiv feed parsing, full-text extraction, every chunking strategy, BM25, rank fusion, the FAISS
+index, every guardrail, quote checking, retries for incomplete model answers, each metric, exports, and
 every page rendered with an empty and a populated library.
 
 ## Limits worth knowing
@@ -88,6 +97,8 @@ every page rendered with an empty and a populated library.
 - **A matched quote is not a verified claim.** The check confirms the quote is in the paper, not that
   the model's one-sentence claim follows from it.
 - **Similarity scores order results; they are not percentages.**
+- **Guardrails reduce risk; they do not remove it.** Prompt Guard caught 12 of 20 test attacks; the output
+  checks and the prompt are the second line of defence (see `eval/README.md`).
 - **Authors are matched by name string**, so namesakes merge and spelling variants split.
 - **Citation counts** depend on Semantic Scholar having indexed the paper, and its anonymous API is
   rate-limited.

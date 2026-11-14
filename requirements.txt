@@ -8,6 +8,7 @@ numpy==2.5.4
 pandas==3.1.1
 scikit-learn==1.9.1      # TF-IDF, k-means, PCA
 networkx==3.7            # co-author network
-fastembed==0.9.1         # local ONNX sentence embeddings (no GPU, no API)
+fastembed==0.9.1         # local ONNX embeddings and cross-encoder re-ranker (no GPU, no API)
+faiss-cpu==1.16.0        # vector index over all stored passages
 altair==6.3.0
 pytest==9.2.0
